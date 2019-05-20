@@ -2,30 +2,31 @@ const express = require('express')
 const router = express.Router()
 var useragent = require('useragent')
 const {Bookmark} = require('../models/bookmark')
+const { authenticateUser } = require('../middlewares/authenticate')
 
-router.get('/', function(req, res){
+router.get('/', authenticateUser, (req, res) => {
     Bookmark.find()
-    .then(function(bookmark){
+    .then(bookmark => {
         res.send(bookmark)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
 })
 
-router.get('/tags',function(req,res){
+router.get('/tags', authenticateUser, (req,res) => {
     let a = req.query.names.split(',')
     Bookmark.find({tags: {"$in": [a[0], a[1]]}})
-        .then(function(bookmark){
+        .then(bookmark => {
             res.send(bookmark)
         })
-        .catch(function(err){
+        .catch(err => {
             res.send(err)
         })
 })
 
 
-router.get ('/:hash', function(req, res){
+router.get ('/:hash', authenticateUser, (req, res) => {
     const hash = req.params.hash
     var agent = useragent.parse(req.headers['user-agent'])
     const clicked = {
@@ -37,31 +38,31 @@ router.get ('/:hash', function(req, res){
     }
     console.log(clicked)
     Bookmark.findOneAndUpdate({hashedUrl : hash}, {$push : {click : clicked}}, {new : true, runValidators: true})
-    .then(function(bookmark){
+    .then(bookmark => {
        res.redirect(bookmark.originalUrl)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
    })
 
-router.post('/', function(req, res){
+router.post('/', authenticateUser, (req, res) => {
     const body = req.body
     const bookmark = new Bookmark(body)
     bookmark.save()
-    .then(function(bookmark){
+    .then(bookmark => {
         res.send(bookmark)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
 })
 
 
-router.get('/:id', function(req,res){
+router.get('/:id', authenticateUser, (req,res) => {
     const id = req.params.id
     Bookmark.findById(id)
-    .then(function(bookmark){
+    .then(bookmark => {
         if(bookmark){
             res.send(bookmark)
         }else { 
@@ -73,36 +74,36 @@ router.get('/:id', function(req,res){
     })
 })
 
-router.put('/:id', function(req, res){
+router.put('/:id', authenticateUser, (req, res) => {
     const id = req.params.id
     const body = req.body
     Bookmark.findByIdAndUpdate(id, {$set : body}, {new : true , runValidators: true})
-    .then(function(bookmark){
+    .then(bookmark => {
         res.send(bookmark)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
 })
 
-router.delete('/:id', function(req, res){
+router.delete('/:id', authenticateUser,(req, res) => {
     const id = req.params.id
     Bookmark.findByIdAndDelete(id)
-    .then(function(bookmark){
+    .then(bookmark => {
         res.send(bookmark)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
 })
 
-router.get('/tags/:name', function(req, res){
+router.get('/tags/:name', authenticateUser, (req, res) => {
     const name = req.params.name
     Bookmark.find({ tags: name})
-    .then(function(bookmark){
+    .then(bookmark =>{
         res.send(bookmark)
     })
-    .catch(function(err){
+    .catch(err => {
         res.send(err)
     })
 })

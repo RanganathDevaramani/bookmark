@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
-const useragent = require('useragent')
 const sh = require('shorthash')
 
 const Schema = mongoose.Schema
