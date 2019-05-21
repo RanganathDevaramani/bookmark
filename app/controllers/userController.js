@@ -5,12 +5,12 @@ const { authenticateUser } = require('../middlewares/authenticate')
 
 router.get('/userList', function(req, res){
     User.find()
-    .then(function(user) {
-        res.send(user)
-    })
-    .catch(function(err){
-        res.send(err)
-    })
+        .then(function(user) {
+            res.send(user)
+        })
+        .catch(function(err){
+            res.send(err)
+        })
 })
 //localhost:3005/users/register
 router.post('/register', function(req, res){
@@ -38,12 +38,12 @@ router.post('/register', function(req, res){
             }
         })
         user.save()
-        .then(function(user){
-            res.send(user)
-        })
-        .catch(function(err){
-            res.send(err)
-        })
+            .then(function(user){
+                res.send(user)
+            })
+            .catch(function(err){
+                res.send(err)
+            })
     }
 
 })
@@ -52,15 +52,15 @@ router.post('/register', function(req, res){
 router.post('/login', function(req, res){
     const body = req.body
     User.findByCredentials(body.email, body.password)
-    .then(function(user){
-        return user.generateToken()    //return Promise object
-        })
         .then(function(user){
-           res.send(user)
-        })
-        .catch(function(err){
-            res.status(404).send(err)
-        })
+            return user.generateToken()    //return Promise object
+            })
+            .then(function(user){
+            res.send(user)
+            })
+            .catch(function(err){
+                res.status(404).send(err)
+            })
 })
 
 router.get('/account', authenticateUser, function(req, res){
@@ -69,8 +69,6 @@ router.get('/account', authenticateUser, function(req, res){
         _id : user.id, 
         username : user.username,
         email : user.email,
-        role : user.role,
-        donation : user.donation
     })
 })
 
@@ -78,12 +76,12 @@ router.get('/account', authenticateUser, function(req, res){
 router.delete('/logout', authenticateUser, function(req, res){
     const { user, token} = req
     User.findByIdAndUpdate(user._id, { $pull : { tokens : {token : token }}})
-    .then(function(){
-        res.send('Successfully logged out')
-    })
-    .catch(function(err){
-        res.send(err)
-    })
+        .then(function(){
+            res.send('Successfully logged out')
+        })
+        .catch(function(err){
+            res.send(err)
+        })
 })
 
 
